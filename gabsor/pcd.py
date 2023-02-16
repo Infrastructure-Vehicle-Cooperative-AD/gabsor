@@ -19,7 +19,7 @@ import laspy
 import struct
 import numpy as np
 from .utils import debug
-from typing import Tuple
+from typing import Tuple, Union
 
 class PCDReader():
     def __init__(self):
@@ -75,12 +75,18 @@ class PCDReader():
             else:
                 data_dict[field] = np.asarray(data_dict[field])
         return data_dict
-    
+
     @staticmethod
-    def compress_pcd(input_file: str, output_file: str, debug_flag: bool = False) -> None:
-        assert input_file.endswith('.pcd'), debug('Error: the input file must be in pcd format', 'error')
+    def compress_pcd(input_file: Union[str, dict], output_file: str, debug_flag: bool = False) -> None:
         assert output_file.endswith('.laz'), debug('Error: the output file must end with .laz', 'error')
-        data_dict = PCDReader.read_pcd(input_file)
+        if isinstance(input_file, dict):
+            data_dict = input_file
+        elif isinstance(input_file, str):
+            data_dict = PCDReader.read_pcd(input_file)
+        else:
+            debug('Error: the input file must be in pcd format or python dict', 'error')
+            return
+        
         header = laspy.LasHeader(version="1.2", point_format=3)
         for key in data_dict.keys():
             if key in ['x', 'y', 'z', 'intensity']:
@@ -98,10 +104,13 @@ class PCDReader():
         las.write(output_file)
         
         if debug_flag:
-            org_size = os.path.getsize(input_file)
-            out_size = os.path.getsize(output_file)
-            debug('PointCloud compress rate:'+str(round(100*out_size/org_size, 1))+'%', 'success')
-    
+            if isinstance(input_file, dict):
+                return
+            elif isinstance(input_file, str):
+                org_size = os.path.getsize(input_file)
+                out_size = os.path.getsize(output_file)
+                debug('PointCloud compress rate:'+str(round(100*out_size/org_size, 1))+'%', 'success')
+
     @staticmethod
     def read_compress_pcd(input_file: str) -> dict:
         las = laspy.read(input_file)

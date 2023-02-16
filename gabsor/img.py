@@ -24,9 +24,9 @@ class ImgReader():
         return img
 
     @staticmethod
-    def compress_img(input_file: str, output_file: str, debug_flag: bool = False) -> None:
+    def compress_img(img, output_file: str, debug_flag: bool = False) -> None:
         assert output_file.endswith('.npy'), debug('Error: the output file must end with .npy', 'error')
-        img = cv2.imread(input_file)
+        # img = cv2.imread(input_file)
         data = ImgReader.encode_img(img)
         np.save(output_file, data)
         
