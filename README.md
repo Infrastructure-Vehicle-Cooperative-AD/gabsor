@@ -12,6 +12,11 @@ pip install --extra-index-url https://rospypi.github.io/simple/ rospy rosbag
 pip install -r requirements.txt
 ```
 
+#### Install gabsor
+```bash
+pip install -e .
+```
+
 ## Usage
 
 #### Compress rosbag
